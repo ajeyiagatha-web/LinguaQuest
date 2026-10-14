@@ -1,31 +1,27 @@
 name: Build Android APK
 on: [push, workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: set up JDK 17
+
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
-      - name: Auto-Create Missing Files
-        run: |
-          if [ ! -f gradlew ]; then
-            echo "Gradle wrapper missing. Creating it automatically..."
-            gradle wrapper
-          fi
-          chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
-      - name: Build Android App
+      - name: Build Debug APK with Gradle
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload Finished APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: "**/build/outputs/apk/debug/*.apk"
+          path: app/build/outputs/apk/debug/app-debug.apk
